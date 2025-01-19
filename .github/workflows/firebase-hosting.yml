@@ -1,0 +1,29 @@
+name: Firebase Deployment
+
+on:
+  push:
+    branches:
+      - main  # Or your specific branch
+
+env:
+  FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Firebase CLI
+        run: |
+          curl -sL https://firebase.tools | bash
+
+      - name: Authenticate with Firebase
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}" > "${HOME}/firebase-service-account.json"
+          firebase use --add
+
+      - name: Deploy to Firebase Hosting
+        run: |
+          firebase deploy --only hosting --token "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}"
